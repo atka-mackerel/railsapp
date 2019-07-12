@@ -1,0 +1,7 @@
+- if @errors&.any?
+  .alert.alert-danger.alert-dismisible.fade.show.clearfix role='alert'
+    ul.float-left.list-unstyled
+      - @errors.each do |message|
+        li = message
+    button.close type='button' data-dismiss='alert' aria-label='閉じる'
+      span aria-hidden='true' &times;

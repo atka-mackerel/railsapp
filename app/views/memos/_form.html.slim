@@ -1,0 +1,80 @@
+= form_with model: @memo, local: true do |f|
+  / - if @memo.errors.any?
+  /   #error_explanation
+  /     h2 = "#{pluralize(@memo.errors.count, "error")} prohibited this memo from being saved:"
+  /     ul
+  /       - @memo.errors.full_messages.each do |message|
+  /         li = message
+
+  .form-group
+    / = f.label :title
+    = f.text_field :title, class: 'form-control', placeholder: Memo.human_attribute_name(:title)
+  .form-group.mt-3
+    / = f.label :text_content
+    = f.text_area :text_content, class: 'form-control', placeholder: Memo.human_attribute_name(:text_content)
+
+  .form-group.mt-3
+    = f.label :draw_content
+    .draw-actions
+      button.btn.btn-sm.btn-info type="button" data-toggle="modal" data-target="#drawModal"
+        | 編集
+      button#btn-draw-clear.btn.btn-sm.btn-secondary.ml-1 type="button"
+        | クリア
+      .draw-view-container.clearfix.form-control
+        img#draw-view.img-fruid src="#{@memo.draw_content}"
+  = f.hidden_field :draw_content, id: 'hidden-content', value: @memo.draw_content
+
+  .form-group.mt-3
+    = f.label :tags
+    #tags-container
+      / = render 'tags/index'
+      .tag-mode.view-mode.clearfix
+        button#btn-edit-tag.btn.btn-sm.btn-info.mr-3.float-left タグ編集
+        / - (@memo.tags || []).each do |tag|
+        - @memo.tags&.each do |tag|
+          .view-tag-group.float-left tag-name=tag.name
+            / a.badge.badge-secondary.mr-1 href="#"
+            span.badge.badge-secondary.mr-1
+              = tag.name 
+            = hidden_field_tag 'tags[][name]', tag.name
+      .tag-mode.edit-mode.clearfix
+        button#btn-complete-tag.btn.btn-sm.btn-info.mr-3.float-left 編集完了
+        .edit-tag-group-container
+          / - (@memo.tags || []).each do |tag|
+          - @memo.tags&.each do |tag|
+            .edit-tag-group.float-left tag-name=tag.name
+              / a.badge.badge-secondary.mr-1 href="#" onclick='return false;'
+              span.badge.badge-secondary.mr-1
+                = tag.name
+              / = link_to content_tag(:i, '', class: 'fa fa-times-circle mr-2 text-danger'), memo_tag_path(@memo, tag), method: :delete, remote: true, class: 'link-destroy-tag'
+              a.link-remove-tag tag-name=tag.name
+                i.fa.fa-times-circle.mr-2.text-danger
+        .input-group.mt-1
+          / input#txt-add-tag.form-control.form-control-sm.col-sm-12.col-md-4 form='create-tag-form' name='tag[name]'
+          input#txt-add-tag.form-control.form-control-sm.col-sm-12.col-md-4 form='add-tag-form'
+          .input-group-append
+            button#btn-add-tag.btn.btn-sm.btn-info form='add-tag-form' タグ追加
+
+  .actions.mt-3
+    = f.submit class: 'btn btn-sm btn-primary'
+
+  / 手書きモーダル
+  .modal.fade id="drawModal" tabindex="-1" role="dialog" aria-labelledby="drawModalLabel"
+    .modal-dialog.modal-xl.input-hand role="document"
+      .modal-content
+        .modal-header
+          h5.modal-title id="exampleModalLabel"
+            | 手書き入力
+          button.close type="button" data-dismiss="modal" aria-label="閉じる"
+            span aria-hidden="true"
+             | &times;
+        .modal-body
+          .draw-container
+            canvas#draw-area
+        .modal-footer
+          button.btn.btn-sm.btn-secondary type="button" data-dismiss="modal"
+            | 閉じる
+          button.btn.btn-sm.btn-primary#btn-draw-complete type="button"
+            | 完了
+
+= form_tag '', id: 'add-tag-form'

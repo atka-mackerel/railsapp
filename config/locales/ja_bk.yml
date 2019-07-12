@@ -1,0 +1,14 @@
+ja:
+  messages:
+    with_comment: ※コメントを取得すると検索に時間がかかります
+    btn_search: 検索
+
+  activerecord:
+    models:
+      youtube_search_condition: Youtube検索条件
+    attributes:
+      youtube_search_condition:
+        q: 検索キーワード
+        type: タイプ
+        published_after: アップロード日
+        with_comment: コメントを取得する

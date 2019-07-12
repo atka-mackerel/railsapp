@@ -1,0 +1,5 @@
+- if flash.notice.present?
+  .alert.alert-success.alert-dismisible.fade.show role='alert'
+    = flash.notice
+    button.close type='button' data-dismiss='alert' aria-label='閉じる'
+      span aria-hidden='true' &times;

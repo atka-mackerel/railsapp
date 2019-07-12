@@ -1,0 +1,11 @@
+h4 = t('.login')
+
+= form_with model: @user, url: login_path, local: true do |f|
+  .form-group
+    = f.label :login_id
+    = f.text_field :login_id, class: 'form-control', id: 'session_login_id'
+  .form-group
+    = f.label :password
+    = f.password_field :password, class: 'form-control', id: 'session_login_id'
+  = f.submit t('.login'), class: 'btn btn-sm btn-primary'
+  = link_to t('.create_new'), new_user_path, class: 'btn btn-secondary btn-sm ml-3'

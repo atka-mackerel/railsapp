@@ -1,0 +1,10 @@
+#!/bin/bash
+
+sudo systemctl stop nginx
+sudo systemctl stop unicorn
+
+sudo systemctl start unicorn
+sudo systemctl start nginx
+
+sudo systemctl status nginx
+sudo systemctl status unicorn

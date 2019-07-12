@@ -1,0 +1,25 @@
+// Place all the styles related to the memos controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.draw-container {
+  height: calc(70vh) !important;
+  padding: 0px !important;
+}
+
+.draw-view-container {
+  height: initial !important;
+}
+
+#draw-view {
+  max-width: 100%;
+}
+
+.font-1-5 {
+  font-size: 1.5rem;
+}
+
+.detail {
+  padding-left: 10px;
+  padding-right: 10px;
+}

@@ -1,0 +1,31 @@
+#message-area
+h3
+  = t('.disp_title')
+.card.shadow.mb-4
+  .card-body
+    = form_with model: @search_condition, url: '/ytsearch/search.json', method: :get, skip_enforcing_utf8: true do |f|
+      .form-row
+        .form-group.col-xl-6.col-md-12
+          = f.text_field :q, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:q)
+        .form-group.col-xl-6.col-md-12
+          = f.text_field :video_id, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:video_id)
+      .form-row
+        .form-group.col-xl-6.col-md-12
+          .input-group
+            = f.date_field :published_after, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:published_after)
+            .input-group-prepend.input-group-append
+              span.input-group-text
+                | ～
+            = f.date_field :published_before, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:published_before)
+        .form-group.col-xl-6.col-md-12
+          = f.select :order, options_for_select(YoutubeSearchCondition.orders_i18n.invert), { include_blank: true }, { class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:order) }
+      .form-group
+        .form-check
+          = f.check_box :with_comment, class: 'form-check-input'
+          = f.label :with_comment
+          small.text-muted.ml-3
+            = t('.with_comment')
+      = f.submit t('.btn_search'), data: { disable_with: t('.btn_searching') }, class: 'btn btn-primary btn-sm'
+      input.btn.btn-secondary.btn-sm.ml-3 type='reset' value = t('.btn_reset')
+#search-results
+= javascript_pack_tag 'cmntsrch/index'

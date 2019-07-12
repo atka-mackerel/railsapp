@@ -1,0 +1,31 @@
+/ 検索結果
+.table-responsive
+  table.table.table-sm.table-hover.table-striped
+    thead
+      tr
+        th = Memo.human_attribute_name(:title)
+        th = Memo.human_attribute_name(:updated_at)
+        / th Type
+        / th Content
+        / th Raw content
+        / th
+
+    tbody
+      - @memos&.each do |memo|
+        tr
+          td
+            / . = memo.title
+            . = link_to memo.title, memo
+            .
+          td.text-nowrap
+            . = l(memo.updated_at, format: :long)
+            .
+              / = link_to content_tag(:i, '', class: 'fa fa-info-circle'), memo, class: 'btn btn-outline-info btn-sm'
+              / = link_to content_tag(:i, '', class: 'fa fa-edit'), edit_memo_path(memo), class: 'btn btn-outline-primary btn-sm ml-1'
+              / = link_to content_tag(:i, '', class: 'fa fa-trash'), memo, data: { confirm: 'Are you sure?' }, method: :delete, class: 'btn btn-outline-danger btn-sm ml-1'
+
+              / = link_to content_tag(:i, '', class: 'fa fa-info-circle'), memo, class: 'text-info font-1-5 ml-3'
+              = link_to content_tag(:i, '', class: 'fa fa-edit'), edit_memo_path(memo), class: 'text-primary font-1-5 ml-3'
+              = link_to content_tag(:i, '', class: 'fa fa-trash'), memo, data: { confirm: 'Are you sure?' }, method: :delete, class: 'text-danger font-1-5 ml-3 del-memo-btn'
+          / td = memo.content
+          / td = memo.search_keyword

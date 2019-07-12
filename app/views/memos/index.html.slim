@@ -1,0 +1,14 @@
+h4 = t('.title')
+
+/ 検索条件
+.card.shadow.mb-4
+  .card-body
+    = render 'memo_search_form'
+
+.card.shadow.mb-4
+  .card-body
+    = link_to t('.create'), new_memo_path, class: 'btn btn-sm btn-primary mb-2'
+
+    / 検索結果
+    #memo-result
+      = render 'memos'

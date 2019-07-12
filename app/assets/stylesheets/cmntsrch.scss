@@ -1,0 +1,21 @@
+// Place all the styles related to the tools controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.card-body.comments {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.media {
+  flex-wrap: wrap;
+}
+
+.movies .media-body {
+    min-width: 80vw;
+    position: relative;
+}
+
+.comment .media-body {
+    min-width: 100%;
+}

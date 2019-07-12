@@ -1,0 +1,19 @@
+table
+  tr
+    th
+      | 動画ID
+    th
+      | タイトル
+    th
+      | コメント
+  - @search_result.data.each do |result|
+    tr
+      td
+        = result[:search_item].id.videoId
+      td
+        = result[:search_item].snippet.title
+      td
+        ul
+          - result[:comment_threads].data.each do |comment_thread|
+            li
+              = comment_thread.snippet.topLevelComment.snippet.textOriginal

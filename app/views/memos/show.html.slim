@@ -1,0 +1,28 @@
+/ p#notice = notice
+h4 = t('.title')
+
+p
+  strong = Memo.human_attribute_name(:title)
+  .detail
+    = @memo.title
+p
+  strong = Memo.human_attribute_name(:text_content)
+  .detail
+    = @memo.text_content
+p
+  strong = Memo.human_attribute_name(:draw_content)
+  .detail
+    img.show-img src="#{@memo.draw_content}" class='img-fluid'
+p
+  strong = Memo.human_attribute_name(:tags)
+  .detail
+    - @memo.tags&.each do |tag|
+      = link_to tag.name, memos_search_path(memo_search_form: { keyword: tag.name, with_title: false, with_content: false }), class: 'badge badge-secondary mr-1 tag-search-link'
+/ p
+/   strong Raw content:
+/   = @memo.raw_content
+
+.mt-3
+= link_to t('.edit'), edit_memo_path(@memo), class: 'mr-3'
+= link_to t('.back'), memos_path, class: ''
+.mb-3
