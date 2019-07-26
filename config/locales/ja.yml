@@ -293,7 +293,7 @@ ja:
 
   home:
     index:
-      description_html: このページはRuby on Rails初心者がアプリ作成～公開の学習を目的に作成したものです。<br/>
+      description_html: このページはRuby on Railsビギナーがアプリ作成～公開の学習を目的に作成したものです。<br/>
                         プロジェクトのソースコードをGithubにて公開しています。
       services_list: サービス一覧
       services:
