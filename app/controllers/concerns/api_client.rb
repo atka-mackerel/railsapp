@@ -29,15 +29,9 @@ module ApiClient
                 'items(id/videoId,snippet(publishedAt,title,description,thumbnails/default/url))'
       )
 
-      begin
-        search_response = @client.list_searches('snippet', parameters)
-
-        return ApiResult.new(data: nil, errors: [{ reason: :noResults }]) unless search_response.items.any?
-
-        return ApiResult.new(data: search_response, errors: nil)
-      rescue Google::Apis::Error => e
-        pp e.body
-        return ApiResult.new(data: nil, errors: body_to_h(e.body)[:error][:errors])
+      api_call do
+        res = @client.list_searches('snippet', parameters)
+        res.items.any? ? res : nil
       end
     end
 
@@ -52,22 +46,15 @@ module ApiClient
                 'replies/comments/snippet' \
                 '(authorDisplayName,authorProfileImageUrl,textOriginal,publishedAt,updatedAt))'
       }.merge!(parameters).symbolize_keys!
-      pp parameters
+      # pp parameters
 
-      begin
-        comment_response = @client.list_comment_threads(
+      api_call do
+        add_accessor(Google::Apis::YoutubeV3::ListCommentThreadsResponse, :videos)
+        
+        @client.list_comment_threads(
           'id,snippet,replies',
           parameters
-        )
-
-        add_accessor(Google::Apis::YoutubeV3::ListCommentThreadsResponse, :videos)
-        comment_response.videos = videos(id: parameters[:video_id])
-
-        return ApiResult.new(data: comment_response, errors: nil)
-      rescue Google::Apis::Error => e
-        pp e.body
-        pp JSON.parse(e.body, symbolize_names: true)
-        return ApiResult.new(data: nil, errors: body_to_h(e.body)[:error][:errors])
+        ).tap { |res| res.videos = videos(id: parameters[:video_id]) }
       end
     end
 
@@ -76,12 +63,8 @@ module ApiClient
         fields: 'items/statistics/commentCount'
       )
 
-      begin
-        video_response = @client.list_videos('statistics', parameters)
-
-        return ApiResult.new(data: video_response, errors: nil)
-      rescue Google::Apis::Error => e
-        return ApiResult.new(data: nil, errors: body_to_h(e.body)[:error][:errors])
+      api_call do
+        @client.list_videos('statistics', parameters)
       end
     end
 
@@ -109,6 +92,17 @@ module ApiClient
     def body_to_h(error_body)
       JSON.parse(error_body, symbolize_names: true)
     end
+
+    def api_call
+      result = yield
+      if result
+        ApiResult.new(data: result, errors: nil)
+      else
+        ApiResult.new(data: nil, errors: [{ reason: :noResults }])
+      end
+    rescue Google::Apis::Error => e
+      ApiResult.new(data: nil, errors: body_to_h(e.body)[:error][:errors])
+    end
   end
 
   class ApiResult
@@ -134,7 +128,7 @@ module ApiClient
       def handle_error(errors)
         @messages = I18n.t('errors.api.youtube')
         errors&.map do |item|
-          @messages[item[:reason].intern] || @messages[:unexpected]
+          @messages[item[:reason]&.intern] || @messages[:unexpected]
         end
       end
   end

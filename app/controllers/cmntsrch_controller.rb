@@ -10,7 +10,10 @@ class CmntsrchController < ApplicationController
                                 else
                                   YoutubeSearchCondition.new(search_params).to_params
                                 end
-    @search_condition = @session_search_condition.reject {|k, _v| k == :with_comment}
+
+    # with_commentはYoutubeAPIのパラメータではないため、除外する
+    @search_condition = @session_search_condition.reject { |k| k == :with_comment }
+
     @search_condition[:page_token] = @next_page_token if @next_page_token
 
     @search_result = @api_client.search_with_comments(
@@ -48,7 +51,7 @@ class CmntsrchController < ApplicationController
       params.require(:youtube_search_condition)
             .permit(
               :q,
-              :video_id,
+              :channel_id,
               :published_after,
               :published_before,
               :with_comment,

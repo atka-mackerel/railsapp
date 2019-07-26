@@ -1,0 +1,10 @@
+doctype html
+html
+  = content_for :custom_head do
+    title = t('.title')
+    = stylesheet_link_tag 'cmntsrch', media: 'all'
+    = javascript_pack_tag 'application'
+
+  = render 'layouts/header'
+  = render 'layouts/navigation'
+  input#active-menu-id type='hidden' value='menu-ytsearch'

@@ -1,43 +1,14 @@
 doctype html
 html
-  head
-    title
-      | Cloud Memo
-    = csrf_meta_tags
-    = csp_meta_tag
-    meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"
-    / = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
-    / = stylesheet_link_tag    'memos', media: 'all', 'data-turbolinks-track': 'reload'
-    / = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
-    / = javascript_include_tag 'memos', 'data-turbolinks-track': 'reload'
-
-    = stylesheet_link_tag    'application', media: 'all'
+  = content_for :custom_head do
+    title = t('.title')
     = stylesheet_link_tag    'memos', media: 'all'
-    = javascript_include_tag 'application'
     = javascript_include_tag 'memos'
 
-  = render 'layouts/navigation'
-  / body.container-for-navbar
-    / nav.navbar.navbar-dark.navbar-expand-lg.bg-dark.fixed-top
-    /   span.navbar-brand
-    /   button.navbar-toggler type="button" data-toggle="collapse" data-target="#Navbar" aria-controls="Navbar" aria-expanded="false" aria-label="ナビゲーションの切替"
-    /     span.navbar-toggler-icon
-    /   .collapse.navbar-collapse id="Navbar"
-    /     ul.navbar-nav.mr-auto
-    /     ul.navbar-nav
-    /       - if @current_user
-    /         li.nav-item.dropdown
-    /           a.nav-link.dropdown-toggle href="#" id="userMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-    /             = t('.disp_name', name: @current_user.name)
-    /           .dropdown-menu aria-labelledby="userMenuLink"
-    /             = link_to t('.logout'), logout_path, method: :delete, class: 'dropdown-item'
-    /             = link_to t('.unregister'), logout_path, method: :delete, class: 'dropdown-item'
-    /       - else
-    /         li.nav-item
-    /           = link_to t('.create_new'), logout_path, method: :delete, class: 'dropdown-item'
-    /           = link_to t('.login'), logout_path, method: :delete, class: 'dropdown-item'
+  = content_for :custom_menu do
+    li.nav-item
+      = link_to t('memos.link_list'), memos_path, class: 'nav-link'
 
-    / = render 'layouts/notice'
-    / = render 'layouts/errors'
-    / .container-fluid
-    /   = yield
+  = render 'layouts/header'
+  = render 'layouts/navigation'
+  input#active-menu-id type='hidden' value='menu-memos'

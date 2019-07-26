@@ -1,4 +1,5 @@
 class MemosController < ApplicationController
+  skip_before_action :store_location, only: %i[create update destroy]
   before_action :set_memo, only: %i[show edit update destroy]
   before_action :search_memos, only: %i[index search search_with_tag]
 

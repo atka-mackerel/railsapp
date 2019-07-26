@@ -227,6 +227,7 @@ ja:
       youtube_search_condition:
         q: 検索キーワード
         video_id: 動画ID
+        channel_id: チャンネルID
         type: タイプ
         published_after: アップロード日
         order: ソート順
@@ -250,7 +251,7 @@ ja:
       memo_search_form:
         keyword: キーワード
         with_title: タイトル
-        with_content: 文字入力内容
+        with_content: テキスト入力内容
         with_tag: タグ
 
   enums:
@@ -265,19 +266,66 @@ ja:
 
   layouts:
     application:
-      disp_title: Youtube検索
+      title: Hello Rails
     navigation:
+      brand: '>ﾟ*)))><'
       create_new: 新規登録
       login: ログイン 
       logout: ログアウト
       unregister: 登録解除
       disp_name: '%{name}さん'
+      services: サービス
+      link_ytsearch: Youtube検索
+      link_memos: Cloud Memo
+      unregister_confirm:  "ユーザの登録情報を削除します。\n
+                           作成したメモもすべて削除されます。\n
+                           よろしいですか？"
+    cmntsrch:
+      title: Youtube検索
+    memos:
+      title: Cloud Memo
     users:
       user: ユーザ
       create_new: 新規登録
+      title: ユーザ新規登録
     sessions:
-      login: ログイン 
+      title: ログイン 
 
+  home:
+    index:
+      description_html: このページはRuby on Rails初心者がアプリ作成～公開の学習を目的に作成したものです。<br/>
+                        プロジェクトのソースコードをGithubにて公開しています。
+      services_list: サービス一覧
+      services:
+        ytsearch:
+          name: Youtube検索
+          description_html: コメント付きでYoutube検索ができます。<br/>
+                            コメントを指定しての検索には対応していませんが、検索後にキーワードでフィルタリングできます。
+        cloudmemo:
+          name: Cloud Memo
+          description_html: ちょっとしたメモを登録することができます。<br/>
+                            メモはテキスト入力と手書き入力ができます。<br/>
+                            タグを付けることもできます。<br/>
+                            利用するにはログインが必要です。
+      environment: 環境等
+      env_languages:
+        title: 言語
+        data: Ruby 2.5.5、javascript、HTML5
+      env_frameworks:
+        title: フレームワーク
+        data: Ruby on Rails 5.2.3、React
+      env_databases:
+        title: データベース
+        data: MySQL
+      env_servers:
+        title: サーバ
+        data: "Ubuntu 18.04.1(Amazon Lightsail)"
+      env_webservers:
+        title: Webサーバ
+        data: Nginx、Unicorn
+      env_source_management:
+        title: ソース管理
+        data: Github
   cmntsrch:
     index:
       disp_title: Youtube検索
@@ -285,30 +333,42 @@ ja:
       btn_search: 検索
       btn_searching: 検索中...
       btn_reset: リセット
+      sort: ソート順
   memos:
+    link_list: メモ一覧
+    link_detail: 参照
+    link_edit: 編集
     memo_search_form:
       filter: 絞り込む
       btn_reset: リセット
     edit:
       title: メモ編集
-      detail: 参照
-      back: 戻る
+    form:
+      edit: 編集
+      edit_tag: タグ編集
+      add_tag: タグ追加
+      complete_edit: 編集完了
+      clear: クリア
+      close: 閉じる
+      complete: 完了
+      input_draw: 手書き入力
+      undo: 戻す
+      redo: やり直し
     index:
       title: メモ一覧
       create: 新規作成
     new:
       title: メモ作成
-      back: 戻る
     show:
       title: メモ詳細
-      edit: 編集
-      back: 戻る
     create:
       success: メモの登録が完了しました。
     update:
       success: メモの編集が完了しました。
     destroy:
       success: メモを削除しました。
+    memos:
+      delete_confirm: 削除します。よろしいですか？
   sessions:
     new:
       login: ログイン
@@ -324,4 +384,6 @@ ja:
       register: 登録
     create:
       success: ユーザ登録が完了しました。
+    destroy:
+      success: ユーザ削除が完了しました。
       

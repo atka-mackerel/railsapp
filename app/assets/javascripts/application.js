@@ -15,3 +15,12 @@
 //= require jquery3
 //= require popper
 //= require bootstrap-sprockets
+
+document.addEventListener('DOMContentLoaded', () => {
+  // メニューのアクティベート
+  let activeMenuId = document.getElementById('active-menu-id');
+  document.querySelectorAll('a.active').forEach(a => {
+    a.classList.remove('active');
+  });
+  activeMenuId && document.getElementById(activeMenuId.value).classList.add('active');
+});

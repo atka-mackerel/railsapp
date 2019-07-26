@@ -14,7 +14,7 @@
  */
 
 // @import "bootstrap";
-@import "font-awesome";
+// @import "font-awesome";
 @import "rfs/scss";
 // @import "bootstrap-sprockets";
 // @import "honoka";
@@ -24,10 +24,36 @@
     padding: 0.2rem 1.5rem;
 }
 
+.navbar {
+    background-color: #BDE0FC;
+}
+
+.navbar-light .navbar-brand,
+.navbar-light .navbar-nav .nav-link.active {
+    color: #0058a0;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: rgb(0, 128, 233);
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+
+.navbar-light .navbar-nav .nav-link.active {
+    color: rgb(0, 89, 161);
+}
+
+.jumbotron {
+    background-color: #BDE0FC;
+    color: #0058a0;
+}
+
+
 .container-for-navbar {
     padding-top: 3.2rem;
 }
 
-.container, .container-fluid {
+.container.main, .container-fluid.main {
     padding-top: 10px;
+    padding-bottom: 3rem;
 }

@@ -1,7 +1,7 @@
 class Memo < ApplicationRecord
   belongs_to :user
-  has_many :memo_tags
-  has_many :tags, through: :memo_tags, dependent: :destroy
+  has_many :memo_tags, dependent: :destroy
+  has_many :tags, through: :memo_tags
 
   validates_presence_of :title, on: %i[create update]
 

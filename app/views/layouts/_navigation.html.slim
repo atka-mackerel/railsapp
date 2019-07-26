@@ -1,25 +1,44 @@
 body.container-for-navbar
-  nav.navbar.navbar-dark.navbar-expand-lg.bg-dark.fixed-top
-    span.navbar-brand
-    button.navbar-toggler type="button" data-toggle="collapse" data-target="#Navbar" aria-controls="Navbar" aria-expanded="false" aria-label="ナビゲーションの切替"
-      span.navbar-toggler-icon
-    .collapse.navbar-collapse id="Navbar"
-      ul.navbar-nav.mr-auto
-      ul.navbar-nav
-        - if @current_user
-          li.nav-item.dropdown
-            a.nav-link.dropdown-toggle href="#" id="userMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+  nav.navbar.navbar-light.navbar-expand-lg.fixed-top
+    .container
+      = link_to t('.brand'), root_path, class: 'navbar-brand'
+      button.navbar-toggler type="button" data-toggle="collapse" data-target="#Navbar1" aria-controls="Navbar1" aria-expanded="false" aria-label="ナビゲーションの切替"
+        span.navbar-toggler-icon
+
+      .collapse.navbar-collapse id="Navbar1"
+        ul.navbar-nav.mr-auto
+          - if @current_user
+            li.nav-item.d-inline.d-lg-none
               = t('.disp_name', name: @current_user.name)
-            .dropdown-menu aria-labelledby="userMenuLink"
-              = link_to t('.logout'), logout_path, method: :delete, class: 'dropdown-item'
-              = link_to t('.unregister'), logout_path, method: :delete, class: 'dropdown-item'
-        - else
-          li.nav-item
-            = link_to t('.create_new'), new_user_path, class: 'nav-link'
-          li.nav-item
-            = link_to t('.login'), login_path, class: 'nav-link'
+          li.nav-item.dropdown
+            a.nav-link.dropdown-toggle href="#" id="serviceMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+              = t('.services')
+            .dropdown-menu aria-labelledby="serviceMenuLink"
+              = link_to t('.link_ytsearch'), ytsearch_path, class: 'dropdown-item', id: 'menu-ytsearch'
+              = link_to t('.link_memos'), memos_path, class: 'dropdown-item', id: 'menu-memos'
+        ul.navbar-nav
+          - if @current_user
+            = yield :custom_menu if content_for?(:custom_menu)
+            li.nav-item.dropdown.d-none.d-lg-inline
+              a.nav-link.dropdown-toggle href="#" id="userMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                = t('.disp_name', name: @current_user.name)
+              .dropdown-menu aria-labelledby="userMenuLink"
+                = link_to t('.logout'), logout_path, method: :delete, class: 'dropdown-item'
+                = link_to t('.unregister'), @current_user, data: { confirm: t('.unregister_confirm') }, method: :delete, class: 'dropdown-item'
+
+            li.nav-item.dropdown.d-inline.d-lg-none
+              = link_to t('.logout'), logout_path, method: :delete, class: 'nav-link'
+            li.nav-item.dropdown.d-inline.d-lg-none
+              = link_to t('.unregister'), @current_user, data: { confirm: t('.unregister_confirm') }, method: :delete, class: 'nav-link'
+
+          - else
+            li.nav-item
+              = link_to t('.login'), login_path, class: 'nav-link', id: 'menu-login'
+            li.nav-item
+              = link_to t('.create_new'), new_user_path, class: 'nav-link', id: 'menu-reg-user'
 
   = render 'layouts/notice'
   = render 'layouts/errors'
-  .container-fluid
+  = yield :custom_pre_content if content_for?(:custom_pre_content)
+  .container.main
     = yield

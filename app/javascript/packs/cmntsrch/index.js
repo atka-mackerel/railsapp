@@ -45,10 +45,13 @@ class MediaList extends Component {
     filterContents(contents, filterText) {
         return contents.map(content => {
             let hasFilteredComment = false;
+            let commentsCount = 0;
             if (content.comments) {
+                commentsCount += content.comments.items.length;
                 content.comments.items = content.comments.items.map(comment => {
                     let hasFilteredReply = false;
                     if (comment.replies) {
+                        commentsCount += comment.replies.items.length;
                         comment.replies.items = comment.replies.items.map(reply => {
                             if (!filterText) {
                                 reply.hide = false;
@@ -69,6 +72,7 @@ class MediaList extends Component {
                     return comment;
                 });
             }
+            content.commentsCount = commentsCount;
             if (!filterText) {
                 content.hide = false;
                 return content;
@@ -174,7 +178,7 @@ const MediaComments = ({ comments }) => {
         <ul className="list-unstyled">
             {comments.items.map((comment, key) => {
                 return (
-                    <li key={key} className={"media comment" + (comment.hide ? ' d-none' : '')}>
+                    <li key={key} className={"media media-comment" + (comment.hide ? ' d-none' : '')}>
                         <a href="#" className="mr-1">
                             <img src={comment.profileImageUrl} alt="メディアの画像" />
                         </a>
@@ -288,11 +292,11 @@ class MediaContent extends Component {
         return (
             this.state.content.hide ?
                 false :
-                <li className="media mb-3 movies">
+                <li className="media mb-3 media-movies">
                     <div className="mr-3">
                         <img src={this.state.content.thumbnail.url} alt="メディアの画像" />
                     </div>
-                    <div className="media-body clear-fix">
+                    <div className="media-body clearfix">
                         <a href={`https://www.youtube.com/watch?v=${encodeURIComponent(this.state.content.videoId)}`} target="_blank" >
                             <h5 className="mt-0 text-break">{this.state.content.title}</h5>
                         </a>
@@ -307,7 +311,7 @@ class MediaContent extends Component {
                                     {this.state.btnText}
                                 </button>
                                 <span className="ml-3">
-                                    {this.state.content.comments.commentCount}&nbsp;件中&nbsp;{this.state.content.comments.items.length}件
+                                    {this.state.content.comments.commentCount}&nbsp;件中&nbsp;{this.state.content.commentsCount}件
                                 </span>
                                 <div className={this.state.collapsed} id={'collapseComment' + this.state.id}>
                                     <div className="card card-body comments">

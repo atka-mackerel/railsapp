@@ -1,0 +1,28 @@
+= content_for :custom_pre_content do
+  .jumbotron.jumbotron-fluid
+    .container
+      h4.display-5
+        | Hello Rails
+      p
+        = t('.description_html')
+        p
+          = link_to 'Github', 'https://github.com/atka-mackerel/railsapp', class: 'btn btn-outline-primary', target: '_blank'
+
+h4 = t('.services_list')
+.mb-5
+  - @services.each do |s|
+    .media.mb-3
+      = image_tag s[:image_path], alt: s[:title], width: '64px', height: '64px', class: 'mr-3'
+      .media-body
+        h5.mt-0
+          = link_to s[:title], s[:link]
+        = t(s[:description])
+    
+.mb-5
+  h4 = t('.environment')
+  table.table.table-responsive
+    tbody
+      - @envs.each do |e|
+        tr
+          th = e[:title]
+          td = e[:data]
