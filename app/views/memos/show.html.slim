@@ -1,6 +1,11 @@
 / p#notice = notice
 h4 = t('.title')
 
+.mb-3.clearfix
+  = link_to t('memos.link_list'), memos_path, class: 'float-right ml-3'
+  = link_to t('memos.link_edit'), edit_memo_path(@memo), class: 'float-right ml-3'
+hr
+
 p
   strong = Memo.human_attribute_name(:title)
   .detail
@@ -15,14 +20,10 @@ p
     img.show-img src="#{@memo.draw_content}" class='img-fluid'
 p
   strong = Memo.human_attribute_name(:tags)
-  .detail
+  .detail.tag-area
     - @memo.tags&.each do |tag|
       = link_to tag.name, memos_search_path(memo_search_form: { keyword: tag.name, with_title: false, with_content: false }), class: 'badge badge-secondary mr-1 tag-search-link'
 / p
 /   strong Raw content:
 /   = @memo.raw_content
 
-.mt-3
-= link_to t('.edit'), edit_memo_path(@memo), class: 'mr-3'
-= link_to t('.back'), memos_path, class: ''
-.mb-3

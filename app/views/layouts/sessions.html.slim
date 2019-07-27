@@ -1,16 +1,10 @@
 doctype html
 html
-  head
-    title
-      = t('.login')
-    = csrf_meta_tags
-    = csp_meta_tag
-    meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"
-    / = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
-    / = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+  = content_for :custom_head do
+    title = t('.title')
+    = stylesheet_link_tag    'sessions', media: 'all'
+    = javascript_include_tag 'sessions'
 
-    = stylesheet_link_tag    'application', media: 'all'
-    = javascript_include_tag 'application'
-    = javascript_pack_tag 'application'
-
+  = render 'layouts/header'
   = render 'layouts/navigation'
+  input#active-menu-id type='hidden' value='menu-login'

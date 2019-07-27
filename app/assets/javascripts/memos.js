@@ -1,39 +1,16 @@
 const TAG_VIEW_MODE_VIEW = 1;
 const TAG_VIEW_MODE_EDIT = 2;
+const CANVAS_DATA_KEY = 'canvas';
+const CANVAS_MAX_HISTORY = 6;
 
-function viewMemoDetail(id) {
-  window.location = `/memos/${id}`
-}
-
-// document.addEventListener('turbolinks:load', () => {
 document.addEventListener('DOMContentLoaded', () => {
-  // 検索フォームのイベント設定
-  // let memoSearchForm = document.getElementById('memo-search-form');
-  // if (memoSearchForm) {
-  //   memoSearchForm.addEventListener('ajax:success', (response) => {
-  //     let memoResult = document.getElementById('memo-result');
-  //     memoResult.innerHTML = response.detail[2].response;
-  //   });
-  // }
-
-  // タグ検索リンクのイベント設定
-  // let tagSearchLinks = document.querySelectorAll('.tag-search-link');
-  // tagSearchLinks.forEach(link => {
-  //   link.addEventListener('ajax:success', (response) => {
-  //     console.log(response.detail[2].response);
-  //     document.write(response.detail[2].response);
-  //   });
-  // });
-
-  // let delMemoBtns = document.querySelectorAll('.del-memo-btn');
-  // delMemoBtns && delMemoBtns.forEach(btn => btn.addEventListener('click', (e) => e.stopPropagation() ) );
-
   let canvas = document.getElementById('draw-area');
   if (!canvas) {
     return;
   }
   
   let ctx;
+  let currentHistory = -1;
   let Xpoint;
   let Ypoint;
   let moveflg = 0;
@@ -46,8 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx = ctx || document.getElementById('draw-area').getContext('2d');
     return ctx;
   }
-
-  setTimeout(scrollTo, 100, 0, 1);
 
   const adjustCanvasSize = () => {
     drawContainer = document.querySelector('.draw-container');
@@ -92,12 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
       _ctx.strokeStyle = defColor;
       _ctx.stroke();
     }
+    storeCanvasData();
     moveflg = 0;
   }
 
   // タップ位置を取得する為の関数群
-  function scrollX(){return document.documentElement.scrollLeft || document.body.scrollLeft;}
-  function scrollY(){return document.documentElement.scrollTop || document.body.scrollTop;}
   function getPosT (event) {
     let mouseX, mouseY;
     if (event.touches) {
@@ -105,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mouseY = event.touches[0].clientY - $(canvas).offset().top + $(window).scrollTop();
     } else {
       mouseX = event.layerX - 15;
-      mouseY = event.layerY - 15 + $(window).scrollTop();
+      mouseY = event.layerY - 15;
     }
     return {x:mouseX, y:mouseY};
   }
@@ -117,8 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const onModalShown = (e) => {
+    clearStoredCanvas();
     adjustCanvasSize();
-    initCanvas();
+    loadCanvasImage();
+    storeCanvasData(document.getElementById('hidden-content').value);
+    controlUndoRedoBtn();
+    // setTimeout(scrollTo, 100, 0, 1);
   }
 
   const viewImage = () => {
@@ -132,25 +110,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const onModalHidden = (e) => {
-    context().clearRect(0, 0, canvas.width, canvas.height);
+    // context().clearRect(0, 0, canvas.width, canvas.height);
+    clearCanvas();
   }
 
   // キャンバスサイズ調整
   // adjustCanvasSize();
 
   // dataurlからイメージを生成しキャンバスに描画
-  const initCanvas = () => {
+  const loadCanvasImage = (data) => {
+    clearCanvas();
     let canvasImg = new Image;
     canvasImg.addEventListener('load', () => {
       console.log('canvasImg', canvasImg);
       context().drawImage(canvasImg, 0, 0);
     });
-    canvasImg.src = document.getElementById('hidden-content').value;
+    console.log('imageData', data);
+    canvasImg.src = data || document.getElementById('hidden-content').value;
   }
 
   // キャンバスのクリア
-  const clearCanvas = () => {
+  const clearCanvasData = () => {
     document.getElementById('hidden-content').value = '';
+  }
+
+  const clearCanvas = () => {
+    context().clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  const clearCanvasModal = () => {
+    clearCanvas();
+    storeCanvasData();
   }
 
   // イメージのクリア
@@ -160,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const onClearViewClick = () => {
     clearDrawView();
-    clearCanvas();
+    clearCanvasData();
   }
 
   const removeTag = (event) => {
@@ -250,20 +240,55 @@ document.addEventListener('DOMContentLoaded', () => {
     switchTagViewMode(TAG_VIEW_MODE_VIEW);
   }
 
-  // const addEventListenerForDestroyTagLink = (event) => {
-  //   console.log('addEvent');
-  //   event.target.addEventListener('ajax:success', replaceTagsContainer);
-  // }
+  const canvasData = () => {
+    return JSON.parse(localStorage.getItem(CANVAS_DATA_KEY) || '[]');
+  }
 
-  // const onSuccessDestroyTag = (e) => {
-  //   console.log(e.detail[0].body.innerHTML);
-  //   tagsContainer.innerHTML = e.detail[0].body.innerHTML;
-  // }
+  const clearStoredCanvas = () => {
+    localStorage.setItem(CANVAS_DATA_KEY, '[]');
+  }
+
+  const storeCanvasData = (data) => {
+    let storage = canvasData();
+    let newData = data || canvas.toDataURL();
+
+    if (storage.length - 1 > currentHistory) {
+      storage = storage.slice(0, currentHistory + 1);
+    }
+    if (storage.length >= CANVAS_MAX_HISTORY) {
+      storage.shift();
+    }
+
+    storage.push(newData);
+    currentHistory = storage.length - 1;
+    localStorage.setItem(CANVAS_DATA_KEY, JSON.stringify(storage));
+    controlUndoRedoBtn();
+  }
+
+  const undoCanvas = () => {
+    if (currentHistory > 0) {
+      let newData = canvasData()[--currentHistory];
+      loadCanvasImage(newData);
+    }
+    controlUndoRedoBtn();
+  }
+
+  const redoCanvas = () => {
+    let storage = canvasData();
+    if (currentHistory < storage.length - 1) {
+      let newData = storage[++currentHistory];
+      loadCanvasImage(newData);
+    }
+    controlUndoRedoBtn();
+  }
+
+  const controlUndoRedoBtn = () => {
+    let storage = canvasData();
+    document.getElementById('btn-undo').disabled = (currentHistory === 0);
+    document.getElementById('btn-redo').disabled = (currentHistory === storage.length - 1);
+  }
 
   const stopDefault = (event) => {
-    // if (event.touches[0].target.tagName.toLowerCase() == "li") { return; }
-    // if (event.touches[0].target.tagName.toLowerCase() == "input") { return; }
-
     event.preventDefault();
   }
 
@@ -292,6 +317,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // モーダル起動時
   $('#drawModal').on('shown.bs.modal', onModalShown);
+
+  // クリアボタン(モーダル)押下時
+  document.getElementById('btn-modal-clear').addEventListener('click', clearCanvasModal);
+
+  // Undoボタン押下時
+  document.getElementById('btn-undo').addEventListener('click', undoCanvas);
+
+  // Redoボタン押下時
+  document.getElementById('btn-redo').addEventListener('click', redoCanvas);
 
   // モーダル終了時
   $('#drawModal').on('hidden.bs.modal', onModalHidden);

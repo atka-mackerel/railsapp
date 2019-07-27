@@ -1,5 +1,5 @@
 - if @errors&.any?
-  .alert.alert-danger.alert-dismisible.fade.show.clearfix role='alert'
+  #errors_area.alert.alert-danger.alert-dismisible.fade.show.clearfix role='alert'
     ul.float-left.list-unstyled
       - @errors.each do |message|
         li = message

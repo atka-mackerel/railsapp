@@ -1,16 +1,12 @@
 json.apiName ApiClient::Youtube::API_COMMENT_THREADS
 json.error @comment_threads.errors
-if !@comment_threads.errors
+if @comment_threads.errors.nil?
   json.pageInfo do
     page_info = @comment_threads.page_info
     json.totalResults page_info.total_results
     json.resultsPerPage page_info.results_per_page
   end
-  if @comment_threads.next_page_token
-    json.nextPageToken @comment_threads.next_page_token
-  else
-    json.nextPageToken ''
-  end
+  json.nextPageToken @comment_threads&.next_page_token || ''
   json.commentCount @comment_threads.videos.items[0].statistics.comment_count
   json.items do
     json.array!(@comment_threads.items) do |comment_thread|

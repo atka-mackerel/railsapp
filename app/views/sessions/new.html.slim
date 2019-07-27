@@ -6,6 +6,6 @@ h4 = t('.login')
     = f.text_field :login_id, class: 'form-control', id: 'session_login_id'
   .form-group
     = f.label :password
-    = f.password_field :password, class: 'form-control', id: 'session_login_id'
+    = f.password_field :password, class: 'form-control', id: 'session_password'
   = f.submit t('.login'), class: 'btn btn-sm btn-primary'
   = link_to t('.create_new'), new_user_path, class: 'btn btn-secondary btn-sm ml-3'

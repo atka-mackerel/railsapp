@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby.exe
+#!/home/ubuntu/.rbenv/shims/ruby
 require 'fileutils'
 include FileUtils
 

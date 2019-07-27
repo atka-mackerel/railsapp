@@ -8,7 +8,7 @@ h3
         .form-group.col-xl-6.col-md-12
           = f.text_field :q, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:q)
         .form-group.col-xl-6.col-md-12
-          = f.text_field :video_id, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:video_id)
+          = f.text_field :channel_id, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:channel_id)
       .form-row
         .form-group.col-xl-6.col-md-12
           .input-group
@@ -18,7 +18,7 @@ h3
                 | ～
             = f.date_field :published_before, class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:published_before)
         .form-group.col-xl-6.col-md-12
-          = f.select :order, options_for_select(YoutubeSearchCondition.orders_i18n.invert), { include_blank: true }, { class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:order) }
+          = f.select :order, options_for_select(YoutubeSearchCondition.orders_i18n.invert), { prompt: t('.sort') }, { class: 'form-control', placeholder: YoutubeSearchCondition.human_attribute_name(:order) }
       .form-group
         .form-check
           = f.check_box :with_comment, class: 'form-check-input'

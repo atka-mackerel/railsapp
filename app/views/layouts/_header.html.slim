@@ -1,0 +1,8 @@
+head
+  = yield :custom_head
+  = csrf_meta_tags
+  = csp_meta_tag
+  meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"
+  = stylesheet_link_tag    'https://use.fontawesome.com/releases/v5.6.3/css/all.css'
+  = stylesheet_link_tag    'application', media: 'all'
+  = javascript_include_tag 'application'

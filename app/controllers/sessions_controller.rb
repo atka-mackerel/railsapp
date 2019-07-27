@@ -1,5 +1,7 @@
 class SessionsController < ApplicationController
+  skip_before_action :store_location
   skip_before_action :login_required
+  after_action :delete_location, only: %i[create]
 
   # Login page
   def new
@@ -11,7 +13,7 @@ class SessionsController < ApplicationController
     @user = User.find_by(login_id: user_params[:login_id])
     if @user&.authenticate(user_params[:password])
       session[:login_id] = @user.login_id
-      redirect_to memos_path
+      redirect_to redirect_path
     else
       handle_errors(t('.auth_failed'))
       @user = User.new

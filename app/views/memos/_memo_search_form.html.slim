@@ -2,17 +2,16 @@
 = form_with model: @form, url: memos_search_path, method: :get, local: true, id: 'memo-search-form' do |f|
   .form-row
     .form-group.col-12
-      = f.text_field :keyword, class: 'form-control', placeholder: MemoSearchForm.human_attribute_name(:keyword)
+      = f.text_field :keyword, class: 'form-control', placeholder: MemoSearchForm.human_attribute_name(:keyword), id: 'memos_keyword'
   .form-row
     .form-check.form-check-inline
-      = f.check_box :with_title, class: 'form-check-input'
-      / = f.label :with_title, class: 'form-check-label'
-      = f.label MemoSearchForm.human_attribute_name(:with_title), class: 'form-check-label'
+      = f.check_box :with_title, class: 'form-check-input', id: 'memos_with_title'
+      = f.label :with_title, class: 'form-check-label'
     .form-check.form-check-inline
-      = f.check_box :with_content, class: 'form-check-input'
+      = f.check_box :with_content, class: 'form-check-input', id: 'memos_with_content'
       = f.label :with_content, class: 'form-check-label'
     .form-check.form-check-inline
-      = f.check_box :with_tag, class: 'form-check-input'
+      = f.check_box :with_tag, class: 'form-check-input', id: 'memos_with_tag'
       = f.label :with_tag, class: 'form-check-label'
   = f.submit t('.filter'), class: 'btn btn-sm btn-primary mt-3 mb-3'
   = link_to t('.btn_reset'), memos_path, class: 'btn btn-secondary btn-sm ml-3'

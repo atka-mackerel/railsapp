@@ -7,15 +7,15 @@
     overflow-y: auto;
 }
 
-.media {
+.media-movies {
   flex-wrap: wrap;
 }
 
-.movies .media-body {
-    min-width: 80vw;
+.media-movies .media-body {
+    min-width: 80%;
     position: relative;
 }
 
-.comment .media-body {
-    min-width: 100%;
-}
+// .media-comment .media-body {
+//     min-width: 100%;
+// }
