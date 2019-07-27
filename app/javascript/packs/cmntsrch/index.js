@@ -66,64 +66,19 @@ const formToQueryString = (form) => {
 
 class MediaList extends Component {
     constructor(props) {
-        console.log('MediaList');
         super(props);
         this.props.references['MediaList'] = this;
         this.addResults = this.addResults.bind(this);
-        // this.filterContents = this.filterContents.bind(this);
-        // console.log('MediaList', this);
         this.state = {
             nextPageToken: props.result.nextPageToken,
             pageInfo: props.result.pageInfo,
-            // contents: props.result.items,
             contents: filterContents(props.result.items, ''),
             viewMoreDataLink: props.result.nextPageToken ? true : false,
             loading: false,
             filterText: '',
             isOnSubmit: true,
         };
-        console.log(this.state.contents);
     }
-
-    // filterContents(contents, filterText) {
-    //     return contents.map(content => {
-    //         let hasFilteredComment = false;
-    //         let commentsCount = 0;
-    //         if (content.comments) {
-    //             commentsCount += content.comments.items.length;
-    //             content.comments.items = content.comments.items.map(comment => {
-    //                 let hasFilteredReply = false;
-    //                 if (comment.replies) {
-    //                     commentsCount += comment.replies.items.length;
-    //                     comment.replies.items = comment.replies.items.map(reply => {
-    //                         if (!filterText) {
-    //                             reply.hide = false;
-    //                             return reply;
-    //                         }
-    //                         let includesText = reply.text.includes(filterText);
-    //                         hasFilteredReply = hasFilteredReply || includesText;
-    //                         reply.hide = !includesText;
-    //                         return reply;
-    //                     });
-    //                 }
-    //                 if (!filterText) {
-    //                     comment.hide = false;
-    //                     return comment;
-    //                 }
-    //                 comment.hide = !(comment.text.includes(filterText) || hasFilteredReply);
-    //                 hasFilteredComment = hasFilteredComment || !comment.hide
-    //                 return comment;
-    //             });
-    //         }
-    //         content.commentsCount = commentsCount;
-    //         if (!filterText) {
-    //             content.hide = false;
-    //             return content;
-    //         }
-    //         content.hide = !hasFilteredComment;
-    //         return content;
-    //     });
-    // }
 
     render() {
         return (
@@ -160,11 +115,9 @@ class MediaList extends Component {
     }
 
     addResults = (result, isOnSubmit) => {
-        // console.log('addResults', this);
         this.setState({
             nextPageToken: result.nextPageToken,
             pageInfo: result.pageInfo,
-            // contents: isSubmitClicked ? result.items : this.state.contents.concat(result.items),
             contents: filterContents(isOnSubmit ? result.items : this.state.contents.concat(result.items)),
             viewMoreDataLink: result.nextPageToken ? true : false,
             isOnSubmit: isOnSubmit,
@@ -172,10 +125,6 @@ class MediaList extends Component {
     }
 
     handleCommentFilterChange = (e) => {
-        // console.log('addResults', this);
-        // console.log($(`.comment:not(:contains('${e.target.value}'))`))
-        // $(`.comment:not(:contains('${e.target.value}'))`).hide();
-        // $(`.comment:contains('${e.target.value}')`).show();
         let filterText = document.getElementById('filterText').value;
         this.setState({
             contents: filterContents(this.state.contents, filterText),
@@ -190,27 +139,20 @@ class MediaList extends Component {
             viewMoreDataLink: false,
             loading: true,
         });
-        // console.log('handle');
         const headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
         };
-        // fetch(`/ytsearch/search?${formToQueryString(document.forms[0])}`, { headers })
         fetch(`/ytsearch/search?page_token=${encodeURIComponent(this.state.nextPageToken)}`, { headers })
             .then((res) => res.json())
             .then(result => {
-                // console.log(result);
                 this.addResults(result);
-                // this.setState({
-                //     contents: result
-                // });
             })
             .catch((error) => {
                 console.error(error);
                 // TODO エラー処理
             })
             .finally(() => {
-                // console.log('finally');
                 this.setState({
                     viewMoreDataLink: viewMoreDataLink,
                     loading: false,
@@ -255,12 +197,10 @@ class MediaContent extends Component {
         console.log('MediaContent');
         super(props);
         this.initialState = this.initialState.bind(this);
-        this.countComments = this.countComments.bind(this);
         this.state = this.initialState(props);
     }
 
     initialState = (props) => {
-        // if (this.state && this.state.filterText !== undefined && this.state.filterText != props.filterText) {
         let nextPageToken = props.content.comments ? props.content.comments.nextPageToken : '';
         let newState = props.isOnSubmit || !this.state
             ? {
@@ -295,7 +235,6 @@ class MediaContent extends Component {
             viewMoreDataLink: false,
             loading: true,
         });
-        // console.log('handle');
         const headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
@@ -304,17 +243,12 @@ class MediaContent extends Component {
             video_id: this.state.content.videoId,
             page_token: this.state.content.comments.nextPageToken,
         };
-        // console.log('comments params', params);
-        // fetch(`/ytsearch/search?${formToQueryString(document.forms[0])}`, { headers })
         fetch(`/ytsearch/comments?${jsonToQueryString(params)}`, { headers })
             .then((res) => res.json())
             .then(result => {
-                // console.log(result);
-                // this.addResults(result);
                 let comments = this.state.content.comments;
                 comments.nextPageToken = result.nextPageToken;
                 comments.items = comments.items.concat(result.items);
-                // let newContent = filterComments(this.state.content, document.getElementById('filterText'));
                 let newContent = filterComments(this.state.content, document.getElementById('filterText').value);
                 this.setState({
                     content: newContent,
@@ -325,16 +259,11 @@ class MediaContent extends Component {
                 // TODO エラー処理
             })
             .finally(() => {
-                // console.log('finally');
                 this.setState({
                     viewMoreDataLink: viewMoreDataLink,
                     loading: false,
                 });
             });
-    }
-
-    countComments() {
-        // Not Implemented TODO
     }
 
     render() {
@@ -361,11 +290,10 @@ class MediaContent extends Component {
                                 </button>
                                 <span className="ml-3">
                                     {this.state.content.comments.commentCount}&nbsp;件中&nbsp;{this.state.content.commentsCount}件
-                                        </span>
+                                </span>
                                 <div className={this.state.collapsed} id={'collapseComment' + this.state.id}>
                                     <div className="card card-body comments">
                                         <MediaComments comments={this.state.content.comments} />
-                                        {/* <button className="btn btn-link" onClick={this.handleSubmit.bind(this)}>更に表示</button> */}
                                         <div>
                                             {this.state.viewMoreDataLink ?
                                                 <button className="btn btn-link" onClick={this.handleSubmit}>更に表示</button> :
@@ -389,14 +317,6 @@ class MediaContent extends Component {
     }
 }
 
-// const mapStateToProps = state => {
-//     return state.ytsearch;
-// }
-
-// const mapDispatchToProps = dispatch => {
-
-// }
-
 class AlertMessage extends Component {
     constructor(props) {
         super(props);
@@ -414,7 +334,6 @@ class AlertMessage extends Component {
     }
 
     showMessage = (errors, type) => {
-        // console.log(errors);
         this.setState({
             message: errors.join("\n"),
             type: type,
@@ -424,7 +343,6 @@ class AlertMessage extends Component {
     render() {
         return (this.state.message
             ? <div style={{ whiteSpace: 'pre-line' }} className={"fixed-top alert alert-dismissible fade show alert-" + this.state.type} role="alert">
-                {/* <button type="button" className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> */}
                 <button type="button" className="close" aria-label="Close" onClick={this.closeMessage}><span aria-hidden="true">&times;</span></button>
                 {this.state.message}
               </div>
@@ -438,13 +356,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSubmitClicked = false;
 
     document.forms[0].addEventListener('submit', (e) =>{
-        // console.log('submit');
         isSubmitClicked = true;
         e.preventDefault();
     });
 
     document.forms[0].addEventListener('ajax:success', (result) => {
-        console.log('ajax:success', result.detail[0]);
+        // console.log('ajax:success', result.detail[0]);
         references.AlertMessage.closeMessage();
 
         const action = {
@@ -477,5 +394,4 @@ document.addEventListener('DOMContentLoaded', () => {
             references={references} />,
         document.getElementById('search-results'),
     );
-    // console.log('refer', references);
 });
