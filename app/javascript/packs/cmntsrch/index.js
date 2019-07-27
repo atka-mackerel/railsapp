@@ -5,6 +5,48 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
+const filterComments = (content, filterText) => {
+    let hasFilteredComment = false;
+    let commentsCount = 0;
+    if (content.comments) {
+        commentsCount += content.comments.items.length;
+        content.comments.items = content.comments.items.map(comment => {
+            let hasFilteredReply = false;
+            if (comment.replies) {
+                commentsCount += comment.replies.items.length;
+                comment.replies.items = comment.replies.items.map(reply => {
+                    if (!filterText) {
+                        reply.hide = false;
+                        return reply;
+                    }
+                    let includesText = reply.text.includes(filterText);
+                    hasFilteredReply = hasFilteredReply || includesText;
+                    reply.hide = !includesText;
+                    return reply;
+                });
+            }
+            if (!filterText) {
+                comment.hide = false;
+                return comment;
+            }
+            comment.hide = !(comment.text.includes(filterText) || hasFilteredReply);
+            hasFilteredComment = hasFilteredComment || !comment.hide
+            return comment;
+        });
+    }
+    content.commentsCount = commentsCount;
+    if (!filterText) {
+        content.hide = false;
+        return content;
+    }
+    content.hide = !hasFilteredComment;
+    return content;
+}
+
+const filterContents = (contents, filterText) => {
+    return contents.map(content => filterComments(content, filterText));
+}
+
 const formToJson = (form) => {
     return Array.prototype.reduce.call(
         form.querySelectorAll(`input:not([type='checkbox']),input[type='checkbox']:checked`), 
@@ -28,59 +70,60 @@ class MediaList extends Component {
         super(props);
         this.props.references['MediaList'] = this;
         this.addResults = this.addResults.bind(this);
-        this.filterContents = this.filterContents.bind(this);
+        // this.filterContents = this.filterContents.bind(this);
         // console.log('MediaList', this);
         this.state = {
             nextPageToken: props.result.nextPageToken,
             pageInfo: props.result.pageInfo,
             // contents: props.result.items,
-            contents: this.filterContents(props.result.items, ''),
+            contents: filterContents(props.result.items, ''),
             viewMoreDataLink: props.result.nextPageToken ? true : false,
             loading: false,
             filterText: '',
             isOnSubmit: true,
         };
+        console.log(this.state.contents);
     }
 
-    filterContents(contents, filterText) {
-        return contents.map(content => {
-            let hasFilteredComment = false;
-            let commentsCount = 0;
-            if (content.comments) {
-                commentsCount += content.comments.items.length;
-                content.comments.items = content.comments.items.map(comment => {
-                    let hasFilteredReply = false;
-                    if (comment.replies) {
-                        commentsCount += comment.replies.items.length;
-                        comment.replies.items = comment.replies.items.map(reply => {
-                            if (!filterText) {
-                                reply.hide = false;
-                                return reply;
-                            }
-                            let includesText = reply.text.includes(filterText);
-                            hasFilteredReply = hasFilteredReply || includesText;
-                            reply.hide = !includesText;
-                            return reply;
-                        });
-                    }
-                    if (!filterText) {
-                        comment.hide = false;
-                        return comment;
-                    }
-                    comment.hide = !(comment.text.includes(filterText) || hasFilteredReply);
-                    hasFilteredComment = hasFilteredComment || !comment.hide
-                    return comment;
-                });
-            }
-            content.commentsCount = commentsCount;
-            if (!filterText) {
-                content.hide = false;
-                return content;
-            }
-            content.hide = !hasFilteredComment;
-            return content;
-        });
-    }
+    // filterContents(contents, filterText) {
+    //     return contents.map(content => {
+    //         let hasFilteredComment = false;
+    //         let commentsCount = 0;
+    //         if (content.comments) {
+    //             commentsCount += content.comments.items.length;
+    //             content.comments.items = content.comments.items.map(comment => {
+    //                 let hasFilteredReply = false;
+    //                 if (comment.replies) {
+    //                     commentsCount += comment.replies.items.length;
+    //                     comment.replies.items = comment.replies.items.map(reply => {
+    //                         if (!filterText) {
+    //                             reply.hide = false;
+    //                             return reply;
+    //                         }
+    //                         let includesText = reply.text.includes(filterText);
+    //                         hasFilteredReply = hasFilteredReply || includesText;
+    //                         reply.hide = !includesText;
+    //                         return reply;
+    //                     });
+    //                 }
+    //                 if (!filterText) {
+    //                     comment.hide = false;
+    //                     return comment;
+    //                 }
+    //                 comment.hide = !(comment.text.includes(filterText) || hasFilteredReply);
+    //                 hasFilteredComment = hasFilteredComment || !comment.hide
+    //                 return comment;
+    //             });
+    //         }
+    //         content.commentsCount = commentsCount;
+    //         if (!filterText) {
+    //             content.hide = false;
+    //             return content;
+    //         }
+    //         content.hide = !hasFilteredComment;
+    //         return content;
+    //     });
+    // }
 
     render() {
         return (
@@ -95,7 +138,9 @@ class MediaList extends Component {
                 {this.state.contents.length > 0
                     ? <div className="card-body">
                         <ul className="list-unstyled">
-                            {this.state.contents.map((content, i) => <MediaContent key={i} id={i} content={content} isOnSubmit={this.state.isOnSubmit} />)}
+                            {this.state.contents.map((content, i) => {
+                                return <MediaContent key={i} id={i} content={content} isOnSubmit={this.state.isOnSubmit} />
+                            })}
                         </ul>
                         {this.state.viewMoreDataLink
                             ? <button className="btn btn-link" onClick={this.handleSubmit}>更に表示</button>
@@ -120,7 +165,7 @@ class MediaList extends Component {
             nextPageToken: result.nextPageToken,
             pageInfo: result.pageInfo,
             // contents: isSubmitClicked ? result.items : this.state.contents.concat(result.items),
-            contents: this.filterContents(isOnSubmit ? result.items : this.state.contents.concat(result.items)),
+            contents: filterContents(isOnSubmit ? result.items : this.state.contents.concat(result.items)),
             viewMoreDataLink: result.nextPageToken ? true : false,
             isOnSubmit: isOnSubmit,
         });
@@ -133,7 +178,7 @@ class MediaList extends Component {
         // $(`.comment:contains('${e.target.value}')`).show();
         let filterText = document.getElementById('filterText').value;
         this.setState({
-            contents: this.filterContents(this.state.contents, filterText),
+            contents: filterContents(this.state.contents, filterText),
             filterText: filterText,
             isOnSubmit: false,
         });
@@ -162,6 +207,7 @@ class MediaList extends Component {
             })
             .catch((error) => {
                 console.error(error);
+                // TODO エラー処理
             })
             .finally(() => {
                 // console.log('finally');
@@ -268,12 +314,15 @@ class MediaContent extends Component {
                 let comments = this.state.content.comments;
                 comments.nextPageToken = result.nextPageToken;
                 comments.items = comments.items.concat(result.items);
+                // let newContent = filterComments(this.state.content, document.getElementById('filterText'));
+                let newContent = filterComments(this.state.content, document.getElementById('filterText').value);
                 this.setState({
-                    content: this.state.content,
+                    content: newContent,
                 });
             })
             .catch((error) => {
                 console.error(error);
+                // TODO エラー処理
             })
             .finally(() => {
                 // console.log('finally');
@@ -312,14 +361,14 @@ class MediaContent extends Component {
                                 </button>
                                 <span className="ml-3">
                                     {this.state.content.comments.commentCount}&nbsp;件中&nbsp;{this.state.content.commentsCount}件
-                                </span>
+                                        </span>
                                 <div className={this.state.collapsed} id={'collapseComment' + this.state.id}>
                                     <div className="card card-body comments">
                                         <MediaComments comments={this.state.content.comments} />
                                         {/* <button className="btn btn-link" onClick={this.handleSubmit.bind(this)}>更に表示</button> */}
                                         <div>
                                             {this.state.viewMoreDataLink ?
-                                                <button className="btn btn-link" onClick={this.handleSubmit.bind(this)}>更に表示</button> :
+                                                <button className="btn btn-link" onClick={this.handleSubmit}>更に表示</button> :
                                                 false
                                             }
                                             {this.state.loading ?
