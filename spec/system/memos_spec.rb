@@ -307,7 +307,7 @@ describe 'Cloud Memo', type: :system do
             end
             # タグ削除
             del_tags&.each do |item|
-              find("a[tag-name='#{tag2.name}']").click
+              find("a[tag-name='#{item.name}']").click
             end
           end
           click_button '更新'
