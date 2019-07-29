@@ -152,13 +152,81 @@ describe 'Cloud Memo', type: :system do
       end
     end
 
-    context 'user2でログインしている場合', :visit_after_login do
+    context 'user2でログインしている場合', :login do
+      let(:create_memo_num) { 0 }
       let(:login_user) { user2 }
-      let(:after_login_path) { memos_path }
+
+      before do
+        FactoryBot.rewind_sequences
+        FactoryBot.create_list(:memo, create_memo_num, user_id: user2.id)
+        visit memos_path
+      end
 
       it 'メモ１、メモ２が表示されない' do
         expect(page).not_to have_content(memo1.title)
         expect(page).not_to have_content(memo2.title)
+        expect(page).to have_content('メモがありません')
+      end
+
+      context 'メモが1ページに収まる場合' do
+        let(:create_memo_num) { 25 }
+
+        it '1ページに全件表示される' do
+          expect(page).to have_content('25件のメモが表示されています')
+          (1..25).each { |n| expect(page).to have_content("メモタイトル#{n}") }
+        end
+      end
+      
+      context 'メモが1ページに収まらない場合' do
+        let(:create_memo_num) { 100 }
+
+        context 'ページ番号リンク押下' do
+          it '押下したページのデータが表示される' do
+            find('.pagination a', text: '2').click
+            expect(page).to have_content('全100 件中 26 - 50 件のメモが表示されています')
+            (26..50).each { |n| expect(page).to have_content("メモタイトル#{n}") }
+          end
+        end
+
+        context '›リンク押下' do
+          it '次ページのデータが表示される' do
+            find('.pagination a', text: '›').click
+            expect(page).to have_content('全100 件中 26 - 50 件のメモが表示されています')
+            (26..50).each { |n| expect(page).to have_content("メモタイトル#{n}") }
+          end
+        end
+
+        context '»リンク押下' do
+          it '最終ページのデータが表示される' do
+            find('.pagination a', text: '»').click
+            expect(page).to have_content('全100 件中 76 - 100 件のメモが表示されています')
+            (76..100).each { |n| expect(page).to have_content("メモタイトル#{n}") }
+          end
+        end
+
+        context '‹リンク押下' do
+          before do
+            find('.pagination a', text: '»').click
+          end
+
+          it '前ページのデータが表示される' do
+            find('.pagination a', text: '‹').click
+            expect(page).to have_content('全100 件中 51 - 75 件のメモが表示されています')
+            (51..75).each { |n| expect(page).to have_content("メモタイトル#{n}") }
+          end
+        end
+
+        context '«リンク押下' do
+          before do
+            find('.pagination a', text: '»').click
+          end
+
+          it '1ページ目のデータが表示される' do
+            find('.pagination a', text: '«').click
+            expect(page).to have_content('全100 件中 1 - 25 件のメモが表示されています')
+            (1..25).each { |n| expect(page).to have_content("メモタイトル#{n}") }
+          end
+        end
       end
     end
   end
