@@ -83,7 +83,7 @@ class MemosController < ApplicationController
 
     def search_memos
       @form = MemoSearchForm.new(memo_search_params)
-      @memos = @form.search(@current_user.id)
+      @memos = @form.search(@current_user.id).page(params[:page])
     end
 
     def new_tags
