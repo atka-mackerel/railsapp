@@ -6,7 +6,7 @@ class MemoSearchForm
   attribute :with_title, :boolean, default: true
   attribute :with_content, :boolean, default: true
   attribute :with_tag, :boolean, default: true
-  attribute :order, array: :string, default: ''
+  attribute :order, :string, default: ''
 
   ORDER_TITLE_ASC       = 1
   ORDER_TITLE_DESC      = 2
