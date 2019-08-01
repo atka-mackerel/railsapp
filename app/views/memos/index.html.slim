@@ -15,3 +15,6 @@ h4 = t('.title')
     / 検索結果
     #memo-result
       = render 'memos'
+
+    .mb-3
+      = paginate @memos

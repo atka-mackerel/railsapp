@@ -13,5 +13,6 @@
     .form-check.form-check-inline
       = f.check_box :with_tag, class: 'form-check-input', id: 'memos_with_tag'
       = f.label :with_tag, class: 'form-check-label'
-  = f.submit t('.filter'), class: 'btn btn-sm btn-primary mt-3 mb-3'
+  = f.hidden_field :order, value: ''
+  = f.submit t('.filter'), class: 'btn btn-sm btn-primary mt-3 mb-3', id: 'memos_filter'
   = link_to t('.btn_reset'), memos_path, class: 'btn btn-secondary btn-sm ml-3'

@@ -102,6 +102,6 @@ class MemosController < ApplicationController
     end
 
     def memo_search_params
-      params[:memo_search_form]&.permit(:keyword, :with_title, :with_content, :with_tag) || {}
+      params[:memo_search_form]&.permit(:keyword, :with_title, :with_content, :with_tag, :order) || {}
     end
 end
