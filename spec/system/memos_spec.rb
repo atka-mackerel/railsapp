@@ -44,6 +44,64 @@ describe 'Cloud Memo', type: :system do
     end
   end
 
+  # メモ一覧のページ移動
+  # 変数
+  #   before_sort_id: 事前にソートしておく場合に、該当ソートリンクのidをセットする
+  #   login_user:     ログインしているユーザをセットする
+  RSpec.shared_context 'paginate' do
+    before do
+      find(before_sort_id).click if before_sort_id
+    end
+
+    context 'ページ番号リンク押下' do
+      it '押下したページのデータが表示される' do
+        all(:css, '.pagination a', text: '2')[0].click
+        expect(page).to have_content('全100 件中 26 - 50 件のメモが表示されています')
+        Memo.user_memo(login_user.id).order(memo_order).offset(25).limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+      end
+    end
+
+    context '›リンク押下' do
+      it '次ページのデータが表示される' do
+        all(:css, '.pagination a', text: '›')[0].click
+        expect(page).to have_content('全100 件中 26 - 50 件のメモが表示されています')
+        Memo.user_memo(login_user.id).order(memo_order).offset(25).limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+      end
+    end
+
+    context '»リンク押下' do
+      it '最終ページのデータが表示される' do
+        all(:css, '.pagination a', text: '»')[0].click
+        expect(page).to have_content('全100 件中 76 - 100 件のメモが表示されています')
+        Memo.user_memo(login_user.id).order(memo_order).offset(75).limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+      end
+    end
+
+    context '‹リンク押下' do
+      before do
+        all(:css, '.pagination a', text: '»')[0].click
+      end
+
+      it '前ページのデータが表示される' do
+        all(:css, '.pagination a', text: '‹')[0].click
+        expect(page).to have_content('全100 件中 51 - 75 件のメモが表示されています')
+        Memo.user_memo(login_user.id).order(memo_order).offset(50).limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+      end
+    end
+
+    context '«リンク押下' do
+      before do
+        all(:css, '.pagination a', text: '»')[0].click
+      end
+
+      it '1ページ目のデータが表示される' do
+        all(:css, '.pagination a', text: '«')[0].click
+        expect(page).to have_content('全100 件中 1 - 25 件のメモが表示されています')
+        Memo.user_memo(login_user.id).order(memo_order).limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+      end
+    end
+  end
+
   shared_examples_for 'to_login' do
     it 'ログイン画面に遷移する' do
       visit first_visit_path
@@ -54,6 +112,7 @@ describe 'Cloud Memo', type: :system do
   RSpec.configure do |config|
     config.include_context 'login', :login
     config.include_context 'visit_after_login', :visit_after_login
+    config.include_context 'paginate', :paginate
   end
 
   describe 'メモ一覧画面' do
@@ -173,64 +232,58 @@ describe 'Cloud Memo', type: :system do
 
         it '1ページに全件表示される' do
           expect(page).to have_content('25件のメモが表示されています')
-          (1..25).each { |n| expect(page).to have_content("メモタイトル#{n}") }
+        end
+
+        it '登録日時の降順でソートされる' do
+          Memo.user_memo(user2.id).order('created_at desc').limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+        end
+
+        context 'タイトル昇順ソートリンク押下' do
+          it 'タイトルの昇順でソートされる' do
+            find('#title_asc').click
+            Memo.user_memo(user2.id).order('title asc').limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+          end
+        end
+
+        context 'タイトル降順ソートリンク押下' do
+          it 'タイトルの降順でソートされる' do
+            find('#title_desc').click
+            Memo.user_memo(user2.id).order('title desc').limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+          end
+        end
+
+        context '更新日時昇順ソートリンク押下' do
+          it '更新日時の昇順でソートされる' do
+            find('#updated_at_asc').click
+            Memo.user_memo(user2.id).order('updated_at asc').limit(25).zip(all(:css, '.memo_updated_at')).each { |t1, t2| expect(t2.text).to eq I18n.l(t1.updated_at, format: :long) }
+          end
+        end
+
+        context '更新日時降順ソートリンク押下' do
+          it '更新日時の降順でソートされる' do
+            find('#updated_at_desc').click
+            Memo.user_memo(user2.id).order('updated_at desc').limit(25).zip(all(:css, '.memo_updated_at')).each { |t1, t2| expect(t2.text).to eq I18n.l(t1.updated_at, format: :long) }
+          end
         end
       end
-      
+
       context 'メモが1ページに収まらない場合' do
         let(:create_memo_num) { 100 }
+        let(:login_user) { user2 }
 
-        context 'ページ番号リンク押下' do
-          it '押下したページのデータが表示される' do
-            find('.pagination a', text: '2').click
-            expect(page).to have_content('全100 件中 26 - 50 件のメモが表示されています')
-            (26..50).each { |n| expect(page).to have_content("メモタイトル#{n}") }
-          end
+        context 'ソートなしの場合', :paginate do
+          let(:before_sort_id) {}
+          let(:memo_order) { 'created_at desc' }
         end
 
-        context '›リンク押下' do
-          it '次ページのデータが表示される' do
-            find('.pagination a', text: '›').click
-            expect(page).to have_content('全100 件中 26 - 50 件のメモが表示されています')
-            (26..50).each { |n| expect(page).to have_content("メモタイトル#{n}") }
-          end
-        end
-
-        context '»リンク押下' do
-          it '最終ページのデータが表示される' do
-            find('.pagination a', text: '»').click
-            expect(page).to have_content('全100 件中 76 - 100 件のメモが表示されています')
-            (76..100).each { |n| expect(page).to have_content("メモタイトル#{n}") }
-          end
-        end
-
-        context '‹リンク押下' do
-          before do
-            find('.pagination a', text: '»').click
-          end
-
-          it '前ページのデータが表示される' do
-            find('.pagination a', text: '‹').click
-            expect(page).to have_content('全100 件中 51 - 75 件のメモが表示されています')
-            (51..75).each { |n| expect(page).to have_content("メモタイトル#{n}") }
-          end
-        end
-
-        context '«リンク押下' do
-          before do
-            find('.pagination a', text: '»').click
-          end
-
-          it '1ページ目のデータが表示される' do
-            find('.pagination a', text: '«').click
-            expect(page).to have_content('全100 件中 1 - 25 件のメモが表示されています')
-            (1..25).each { |n| expect(page).to have_content("メモタイトル#{n}") }
-          end
+        context 'ソートありの場合', :paginate do
+          let(:before_sort_id) { '#title_asc' }
+          let(:memo_order) { 'title asc' }
         end
       end
     end
   end
-  
+
   describe '新規登録画面' do
     context 'ログインしていない場合' do
       let(:first_visit_path) { new_memo_path }
@@ -285,7 +338,7 @@ describe 'Cloud Memo', type: :system do
             expect(find('#errors_area')).to have_content('タイトルを入力してください')
           end
         end
-      
+
         context 'タイトルのみ入力した状態' do
           let(:new_memo) { memo4 }
           it '登録が完了し、詳細画面にタイトルが表示される' do
@@ -388,7 +441,7 @@ describe 'Cloud Memo', type: :system do
             expect(find('#errors_area')).to have_content('タイトルを入力してください')
           end
         end
-      
+
         context 'タイトルのみ入力した状態' do
           let(:new_memo) { memo4 }
           it '登録が完了し、詳細画面にタイトルが表示される' do
@@ -455,18 +508,18 @@ describe 'Cloud Memo', type: :system do
         end
       end
     end
-    
+
     context 'ログインしている場合', :visit_after_login do
       let(:login_user) { user1 }
       let(:after_login_path) { memo_path(memo1) }
-      
+
       context '編集リンク押下' do
         it '編集画面に遷移する' do
           find('.main a', text: '編集').click
           expect(current_path).to eq edit_memo_path(memo1)
         end
       end
-      
+
       context 'メモ一覧リンク押下' do
         it '一覧画面に遷移する' do
           find('.main a', text: 'メモ一覧').click

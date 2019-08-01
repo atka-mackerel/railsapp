@@ -3,6 +3,12 @@ const TAG_VIEW_MODE_EDIT = 2;
 const CANVAS_DATA_KEY = 'canvas';
 const CANVAS_MAX_HISTORY = 6;
 
+const onClickOrderLink = (order) => {
+  let targetElement = document.getElementsByName('memo_search_form[order]')[0];
+  targetElement.value = order;
+  document.getElementById('memo-search-form').submit();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   let canvas = document.getElementById('draw-area');
   if (!canvas) {

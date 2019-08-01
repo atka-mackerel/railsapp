@@ -253,6 +253,7 @@ ja:
         with_title: タイトル
         with_content: テキスト入力内容
         with_tag: タグ
+        order: ソート順
 
   enums:
     youtube_search_condition:
@@ -293,7 +294,7 @@ ja:
 
   home:
     index:
-      description_html: このページはRuby on Railsビギナーがアプリ作成～公開の学習を目的に作成したものです。<br/>
+      description_html: このページはRuby on Railsでのアプリ作成～公開の学習を目的に作成したものです。<br/>
                         プロジェクトのソースコードをGithubにて公開しています。
       services_list: サービス一覧
       services:
@@ -368,6 +369,8 @@ ja:
     destroy:
       success: メモを削除しました。
     memos:
+      order_asc: ▲
+      order_desc: ▼
       delete_confirm: 削除します。よろしいですか？
   sessions:
     new:

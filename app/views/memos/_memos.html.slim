@@ -3,18 +3,28 @@
   table.table.table-sm.table-hover.table-striped
     thead
       tr
-        th = Memo.human_attribute_name(:title)
-        th.text-right.text-lg-left = Memo.human_attribute_name(:updated_at)
+        th
+          a#title_asc href='javascript:void(0);' onclick="onClickOrderLink(#{MemoSearchForm::ORDER_TITLE_ASC});"
+            = t('.order_asc')
+          = Memo.human_attribute_name(:title)
+          a#title_desc href='javascript:void(0);' onclick="onClickOrderLink(#{MemoSearchForm::ORDER_TITLE_DESC});"
+            = t('.order_desc')
+        th.text-right.text-lg-left
+          a#updated_at_asc href='javascript:void(0);' onclick="onClickOrderLink(#{MemoSearchForm::ORDER_UPDATED_AT_ASC});"
+            = t('.order_asc')
+          = Memo.human_attribute_name(:updated_at)
+          a#updated_at_desc href='javascript:void(0);' onclick="onClickOrderLink(#{MemoSearchForm::ORDER_UPDATED_AT_DESC});"
+            = t('.order_desc')
 
     tbody
       - @memos&.each do |memo|
         tr
           td
-            . = link_to memo.title, memo
+            . = link_to memo.title, memo, class: 'memo_title'
             .
           td.text-nowrap.text-right.text-lg-left
             .
-              small = l(memo.updated_at, format: :long)
+              small.memo_updated_at = l(memo.updated_at, format: :long)
             .
               = link_to content_tag(:i, '', class: 'fas fa-edit'), edit_memo_path(memo), class: 'text-primary font-1-5 mr-3', id: "memos_edit_link#{memo.id}"
               = link_to content_tag(:i, '', class: 'fas fa-trash-alt'), memo, data: { confirm: t('.delete_confirm') }, method: :delete, class: 'text-danger font-1-5 mr-3 del-memo-btn', id: "memos_delete_link#{memo.id}"
