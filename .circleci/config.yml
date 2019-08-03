@@ -57,6 +57,10 @@ jobs:
       - run: bundle exec rake db:schema:load
 
   test:
+    docker:
+      # specify the version you desire here
+      - image: circleci/ruby:2.5.5-buster-node-browsers-legacy
+
     # run tests!
     steps:
       - type: shell
