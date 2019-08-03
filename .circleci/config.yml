@@ -13,7 +13,6 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
-
     working_directory: ~/repos
 
     steps:
@@ -71,3 +70,28 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "28:d4:93:a2:b7:7c:e1:1d:a4:66:8e:ad:b9:38:25:51"
+      - run:
+          name: Deploy Over SSH
+          command: |
+            ssh $SSH_USER@$SSH_HOST -p 22 "cd ~/rails/tools; git pull origin master:master; bin/bundle; bin/rails db:migrate; bin/rails assets:precompile; bin/restart"
+
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: staging
+      - deploy:
+          filters:
+            branches:
+              only: master
