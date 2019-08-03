@@ -222,11 +222,16 @@ class MediaContent extends Component {
         this.setState(this.initialState(nextProps));
     }
 
-    handleCommentBtnClick = () => {
+    handleCommentBtnClick = (e) => {
         this.setState({
             collapsed: this.state.collapsed ? '' : 'collapse',
             btnText: MediaContent.NEXT_BTN_TEXT[this.state.collapsed],
         });
+
+        if (this.state.collapsed) {
+            const nav = document.querySelector('.navbar');
+            $("html,body").animate({scrollTop:$(e.target).offset().top - nav.clientHeight - 40}, 500);
+        }
     }
 
     handleSubmit = () => {
