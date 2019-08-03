@@ -62,6 +62,7 @@ group :test do
   gem 'rspec-rails', '~> 3.8'
   gem 'factory_bot_rails', '~> 4.11'
   gem 'rails-controller-testing'
+  gem 'rspec_junit_formatter'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
