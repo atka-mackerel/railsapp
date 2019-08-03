@@ -354,7 +354,7 @@ describe 'Cloud Memo', type: :system do
             expect(current_path).to eq memo_path(memo5)
             expect(page).to have_content(memo5.title)
             expect(page).to have_content(memo5.text_content)
-            expect(find('.show-img')[:src]).to eq memo5.draw_content
+            expect(find('.show-img')[:src]).to eq Memo.find(memo5.id).draw_content
             expect(find('.tag-area')).to have_content(tag1.name)
             expect(find('.tag-area')).to have_content(tag2.name)
           end
@@ -458,7 +458,7 @@ describe 'Cloud Memo', type: :system do
             expect(current_path).to eq memo_path(memo1)
             expect(page).to have_content(memo5.title)
             expect(page).to have_content(memo5.text_content)
-            expect(find('.show-img')[:src]).to eq memo5.draw_content
+            expect(find('.show-img')[:src]).to eq Memo.find(memo1.id).draw_content
             expect(find('.tag-area')).to have_content(tag1.name)
             expect(find('.tag-area')).to have_content(tag3.name)
           end
