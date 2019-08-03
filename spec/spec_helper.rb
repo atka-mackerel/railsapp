@@ -17,12 +17,13 @@ require 'capybara/rspec'
 require 'selenium-webdriver'
 require 'support/ajax_helper'
 
-Selenium::WebDriver::Chrome.driver_path = "/mnt/c/Ruby25-x64/webdriver/chromedriver.exe"
+Selenium::WebDriver::Chrome.driver_path = '/mnt/c/Ruby25-x64/webdriver/chromedriver.exe' if File.exist?('/mnt/c/Ruby25-x64/webdriver/chromedriver.exe')
 
 RSpec.configure do |config|
   config.before(:each, type: :system) do
     # driven_by :selenium_chrome_headless
     driven_by :selenium_chrome
+    Capybara.current_session.driver.browser.manage.window.resize_to(1280, 800)
   end
 
   config.include(AjaxHelper, type: :system)
