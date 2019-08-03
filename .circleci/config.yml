@@ -56,7 +56,9 @@ jobs:
       - run: bundle exec rake db:create
       - run: bundle exec rake db:schema:load
 
-      # run tests!
+  test:
+    # run tests!
+    steps:
       - type: shell
         command: |
           bundle exec rspec --profile 10 \
@@ -86,9 +88,16 @@ jobs:
 
 workflows:
   version: 2
-  build-and-deploy:
+  build-test-and-deploy:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              only: staging
+      - test:
+          filters:
+            branches:
+              only: staging
       - deploy:
           filters:
             branches:
