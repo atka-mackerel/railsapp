@@ -24,5 +24,5 @@ h4 = t('.services_list')
     tbody
       - @envs.each do |e|
         tr
-          th = e[:title]
-          td = e[:data]
+          th = e[:item][:title]
+          td = e[:item][:data]
