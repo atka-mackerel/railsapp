@@ -1,0 +1,31 @@
+#!/bin/bash
+# deploy railsapp
+
+function handle_error () {
+  exit 1
+}
+
+# move to app dir
+echo "move to app dir"
+cd ~/rails/tools
+
+# pull resources from remote repository
+echo "pull resources from remote repository"
+git pull origin master:master || handle_error
+
+# bundle install
+echo "bundle install"
+bin/bundle || handle_error
+
+# db migrate
+echo "db migrate"
+bin/rails db:migrate || handle_error
+
+# assets precompile
+echo "assets precompile"
+bin/rails assets:precompile || handle_error
+
+# restart server
+echo "restart server"
+bin/restart || handle_error
+
