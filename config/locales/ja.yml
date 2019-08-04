@@ -309,24 +309,28 @@ ja:
                             タグを付けることもできます。<br/>
                             利用するにはログインが必要です。
       environment: 環境等
-      env_languages:
-        title: 言語
-        data: Ruby 2.5.5、javascript、HTML5
-      env_frameworks:
-        title: フレームワーク
-        data: Ruby on Rails 5.2.3、React
-      env_databases:
-        title: データベース
-        data: MySQL
-      env_servers:
-        title: サーバ
-        data: "Ubuntu 18.04.1(Amazon Lightsail)"
-      env_webservers:
-        title: Webサーバ
-        data: Nginx、Unicorn
-      env_source_management:
-        title: ソース管理
-        data: Github
+      environments:
+        - item:
+            title: 言語
+            data: Ruby 2.5.5、javascript、HTML5
+        - item:
+            title: フレームワーク
+            data: Ruby on Rails 5.2.3、React
+        - item:
+            title: データベース
+            data: MySQL
+        - item:
+            title: サーバ
+            data: "Ubuntu 18.04.1(Amazon Lightsail)"
+        - item:
+            title: Webサーバ
+            data: Nginx、Unicorn
+        - item:
+            title: ソース管理
+            data: Github
+        - item:
+            title: CI
+            data: CircleCI(Github連携)
   cmntsrch:
     index:
       disp_title: Youtube検索
