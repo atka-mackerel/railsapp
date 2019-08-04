@@ -1,10 +1,14 @@
 #!/bin/bash
 
-sudo systemctl stop nginx
-sudo systemctl stop unicorn
+function handle_error () {
+  exit 1
+}
 
-sudo systemctl start unicorn
-sudo systemctl start nginx
+sudo systemctl stop nginx || handle_error
+sudo systemctl stop unicorn || handle_error
+
+sudo systemctl start unicorn || handle_error
+sudo systemctl start nginx || handle_error
 
 sudo systemctl status nginx
 sudo systemctl status unicorn
