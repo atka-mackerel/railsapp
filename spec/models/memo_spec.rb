@@ -123,4 +123,24 @@ describe Memo, type: :model do
       end
     end
   end
+
+  describe 'csv生成' do
+    before do
+        FactoryBot.create(:user, id: 1)
+        FactoryBot.create(:memo, title: 'メモタイトル21', created_at: '2019-08-28 22:30:06', updated_at: '2019-08-28 22:30:06')
+    end
+
+    context '全件出力' do
+      it 'タイトル、テキスト入力、作成日時、更新日時が出力されること' do
+        csv = Memo.generate_csv.encode('UTF-8', 'UTF-8')
+        expected_csv = <<~"EOS"
+\xEF\xBB\xBFtitle,text_content,created_at,updated_at
+メモタイトル21,メモテキスト入力,2019-08-28 22:30:06 +0900,2019-08-28 22:30:06 +0900
+        EOS
+        expect(csv).to eq expected_csv
+      end
+    end
+    
+  end
+  
 end

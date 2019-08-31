@@ -39,17 +39,17 @@ class MemoSearchForm
 
   private
 
-    def where_cond
-      [].tap { |cond|
-        cond << 'memos.title like :keyword' if with_title
-        cond << 'memos.text_content like :keyword' if with_content
-        cond << 'tags.name like :keyword' if with_tag
-      }.join(' or ')
-    end
+  def where_cond
+    [].tap { |cond|
+      cond << 'memos.title like :keyword' if with_title
+      cond << 'memos.text_content like :keyword' if with_content
+      cond << 'tags.name like :keyword' if with_tag
+    }.join(' or ')
+  end
 
-    # パラメータからソート順を判定
-    # デフォルトは作成日時の降順
-    def order_cond
-      ORDER[order.to_i] || 'created_at desc'
-    end
+  # パラメータからソート順を判定
+  # デフォルトは作成日時の降順
+  def order_cond
+    ORDER[order.to_i] || 'created_at desc'
+  end
 end

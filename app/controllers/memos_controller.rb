@@ -1,20 +1,30 @@
 class MemosController < ApplicationController
   skip_before_action :store_location, only: %i[create update destroy]
   before_action :set_memo, only: %i[show edit update destroy]
-  before_action :search_memos, only: %i[index search search_with_tag]
+  before_action :search_memos, only: %i[index]
 
   # GET /memos
   # GET /memos.json
   def index
+    respond_to do |format|
+      format.html { @memos = @memos.page(params[:page]) }
+      format.csv { send_data @memos.generate_csv, filename: "memos-#{Time.zone.now.strftime('%Y%m%d%S')}.csv" }
+    end
   end
 
-  def search
-    render partial: 'memos'
-  end
+  # def search
+  #   respond_to do |format|
+  #     format.html { render partial: 'memos' }
+  #     format.csv { send_csv_data }
+  #   end
+  # end
 
-  def search_with_tag
-    redirect_to memos_search_path(memo_search_form: { keyword: params[:keyword], with_title: false, with_content: false })
-  end
+  # def search_with_tag
+  #   respond_to do |format|
+  #     format.html { redirect_to memos_search_path(memo_search_form: { keyword: params[:keyword], with_title: false, with_content: false }) }
+  #     format.csv { send_csv_data }
+  #   end
+  # end
 
   # GET /memos/1
   # GET /memos/1.son
@@ -76,32 +86,33 @@ class MemosController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_memo
-      @memo = Memo.includes(:tags).find(params[:id])
-    end
 
-    def search_memos
-      @form = MemoSearchForm.new(memo_search_params)
-      @memos = @form.search(@current_user.id).page(params[:page])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_memo
+    @memo = Memo.includes(:tags).find(params[:id])
+  end
 
-    def new_tags
-      tags_params.map do |param|
-        Tag.find_by(param) || Tag.new(param)
-      end
-    end
+  def search_memos
+    @form = MemoSearchForm.new(memo_search_params)
+    @memos = @form.search(@current_user.id)
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def memo_params
-      params.require(:memo).permit(:title, :text_content, :draw_content)
+  def new_tags
+    tags_params.map do |param|
+      Tag.find_by(param) || Tag.new(param)
     end
+  end
 
-    def tags_params
-      params[:tags]&.map {|param| param.permit(:name) } || {}
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def memo_params
+    params.require(:memo).permit(:title, :text_content, :draw_content)
+  end
 
-    def memo_search_params
-      params[:memo_search_form]&.permit(:keyword, :with_title, :with_content, :with_tag, :order) || {}
-    end
+  def tags_params
+    params[:tags]&.map { |param| param.permit(:name) } || {}
+  end
+
+  def memo_search_params
+    params[:memo_search_form]&.permit(:keyword, :with_title, :with_content, :with_tag, :order) || {}
+  end
 end
