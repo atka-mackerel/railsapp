@@ -13,17 +13,37 @@
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+# ENV['RAILS_ENV'] ||= 'test'
+# require File.expand_path('../../config/environment', __FILE__)
+# require 'rspec/rails'
 require 'capybara/rspec'
 require 'selenium-webdriver'
 require 'support/ajax_helper'
-
-Selenium::WebDriver::Chrome.driver_path = '/mnt/c/Ruby25-x64/webdriver/chromedriver.exe' if File.exist?('/mnt/c/Ruby25-x64/webdriver/chromedriver.exe')
+require 'support/download_helper'
+require 'action_dispatch/system_test_case'
 
 RSpec.configure do |config|
   config.before(:each, type: :system) do
+    Selenium::WebDriver::Chrome.driver_path = ENV['WEB_DRIVER_PATH'] if ENV['WEB_DRIVER_PATH'].present?
     # driven_by :selenium_chrome_headless
     driven_by :selenium_chrome
+
     Capybara.current_session.driver.browser.manage.window.resize_to(1280, 800)
+
+    # Capybara.register_driver :chrome_headless do |app|
+    #   Capybara::Selenium::Driver.new(
+    #     app,
+    #     browser: :chrome,
+    #     desired_capabilities: Selenium::WebDriver::Remote::Capabilities.chrome(
+    #       chromeOptions: {
+    #         args: %w[headless disable-gpu window-size=1280,800 no-sandbox disable-dev-shm-usage]
+    #       }
+    #     )
+    #   )
+    # end
+    # Capybara.default_driver = :chrome_headless
+
+    page.driver.browser.download_path = FileDownloadHelper.browser_download_path
   end
 
   config.include(AjaxHelper, type: :system)

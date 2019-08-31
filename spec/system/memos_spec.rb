@@ -100,12 +100,35 @@ describe 'Cloud Memo', type: :system do
         Memo.user_memo(login_user.id).order(memo_order).limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
       end
     end
+
+    context 'CSVエクスポートボタン押下' do
+      it_behaves_like 'csv_export'
+    end
   end
 
   shared_examples_for 'to_login' do
     it 'ログイン画面に遷移する' do
       visit first_visit_path
       expect(current_path).to eq login_path
+    end
+  end
+
+  shared_examples_for 'csv_export' do
+    it '画面で検索されているメモがCSVに出力されること、CSVのソート順が画面のソート順と一致すること' do
+      find('#export_btn').click
+      FileDownloadHelper.wait_for_download
+      files = FileDownloadHelper.downloads
+      table = CSV.table(files.last)
+      memos = Memo.user_memo(login_user.id).tap do |m|
+        m.where!(memo_cond) if defined? memo_cond
+        m.order!(memo_order) if defined? memo_order
+      end
+
+      header = %i[title text_content created_at updated_at]
+      header.each_with_index { |col, i| expect(table.headers[i]).to eq(col) }
+      memos.zip(table).each do |t1, t2|
+        header.each { |col| expect(t2[col]).to eq t1.send(col).to_s }
+      end
     end
   end
 
@@ -150,6 +173,11 @@ describe 'Cloud Memo', type: :system do
           expect(page).not_to have_content(memo2.title)
         end
 
+        context 'CSVエクスポートボタン押下' do
+          let(:memo_cond) { Hash.new(title: memo1.title) }
+          it_behaves_like 'csv_export'
+        end
+
         context 'リセットリンク押下' do
           it '絞り込みが解除され、メモ１、メモ２が表示される' do
             click_link 'リセット'
@@ -157,7 +185,6 @@ describe 'Cloud Memo', type: :system do
             expect(page).to have_content(memo2.title)
           end
         end
-        
       end
 
       context '新規作成ボタン押下' do
@@ -239,30 +266,62 @@ describe 'Cloud Memo', type: :system do
         end
 
         context 'タイトル昇順ソートリンク押下' do
-          it 'タイトルの昇順でソートされる' do
+          before do
             find('#title_asc').click
+          end
+
+          it 'タイトルの昇順でソートされる' do
             Memo.user_memo(user2.id).order('title asc').limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+          end
+
+          context 'CSVエクスポートボタン押下' do
+            let(:memo_order) { 'title asc' }
+            it_behaves_like 'csv_export'
           end
         end
 
         context 'タイトル降順ソートリンク押下' do
-          it 'タイトルの降順でソートされる' do
+          before do
             find('#title_desc').click
+          end
+
+          it 'タイトルの降順でソートされる' do
             Memo.user_memo(user2.id).order('title desc').limit(25).zip(all(:css, '.memo_title')).each { |t1, t2| expect(t2.text).to eq t1.title }
+          end
+
+          context 'CSVエクスポートボタン押下' do
+            let(:memo_order) { 'title desc' }
+            it_behaves_like 'csv_export'
           end
         end
 
         context '更新日時昇順ソートリンク押下' do
-          it '更新日時の昇順でソートされる' do
+          before do
             find('#updated_at_asc').click
+          end
+
+          it '更新日時の昇順でソートされる' do
             Memo.user_memo(user2.id).order('updated_at asc').limit(25).zip(all(:css, '.memo_updated_at')).each { |t1, t2| expect(t2.text).to eq I18n.l(t1.updated_at, format: :long) }
+          end
+
+          context 'CSVエクスポートボタン押下' do
+            let(:memo_order) { 'updated_at' }
+            it_behaves_like 'csv_export'
           end
         end
 
         context '更新日時降順ソートリンク押下' do
-          it '更新日時の降順でソートされる' do
+          before do
             find('#updated_at_desc').click
+          end
+
+          it '更新日時の降順でソートされる' do
             Memo.user_memo(user2.id).order('updated_at desc').limit(25).zip(all(:css, '.memo_updated_at')).each { |t1, t2| expect(t2.text).to eq I18n.l(t1.updated_at, format: :long) }
+          end
+
+          context 'CSVエクスポートボタン押下' do
+            let(:memo_order) { 'updated_at desc' }
+            it_behaves_like 'csv_export'
           end
         end
       end
@@ -528,12 +587,20 @@ describe 'Cloud Memo', type: :system do
       end
 
       context 'タグリンク押下' do
-        it 'メモ一覧画面に遷移し、タグで絞り込まれた結果が表示される' do
+        before do
           find('a', text: tag1.name).click
+        end
+
+        it 'メモ一覧画面に遷移し、タグで絞り込まれた結果が表示される' do
           expect(current_path).to eq memos_search_path
           expect(find('#memos_keyword')[:value]).to eq tag1.name
           expect(find('#memo-result')).to have_content memo1.title
           expect(find('#memo-result')).not_to have_content memo2.title
+        end
+
+        context 'CSVエクスポートボタン押下' do
+          let(:memo_cond) { Hash.new('tag.name': tag1.name) }
+          it_behaves_like 'csv_export'
         end
       end
     end

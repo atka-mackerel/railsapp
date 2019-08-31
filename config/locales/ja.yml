@@ -362,6 +362,7 @@ ja:
     index:
       title: メモ一覧
       create: 新規作成
+      export: エクスポート
     new:
       title: メモ作成
     show:

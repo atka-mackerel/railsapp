@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   resources :users, only: %i[new create destroy]
 
   get '/memos/search', to: 'memos#index'
+  # get '/memos/export', to: 'memos#export'
   # post '/memos/search/tag', to: 'memos#search_with_tag'
   resources :memos
 
