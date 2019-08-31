@@ -24,7 +24,7 @@ require 'action_dispatch/system_test_case'
 
 RSpec.configure do |config|
   config.before(:each, type: :system) do
-    Selenium::WebDriver::Chrome.driver_path = ENV['WEB_DRIVER_PATH'] if File.exist?(ENV['WEB_DRIVER_PATH'])
+    Selenium::WebDriver::Chrome.driver_path = ENV['WEB_DRIVER_PATH'] if ENV['WEB_DRIVER_PATH'].present?
     # driven_by :selenium_chrome_headless
     driven_by :selenium_chrome
 
