@@ -2,6 +2,8 @@
 
 Ruby on Railsアプリの作成～公開の学習を目的に作成しました。
 
+URL: https://sleepy-fish.tk/
+
 
 
 * Rubyバージョン
